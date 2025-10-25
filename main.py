@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import asyncio
 from contextlib import asynccontextmanager
@@ -28,9 +29,18 @@ async def fetch_status_periodically():
                 print("No document found")
         except Exception as e:
             print(f"Error fetching status: {e}")
-        await asyncio.sleep(2)  # 2 seconds
+        await asyncio.sleep(2)  # 2 seconds delay between fetches
 
 app = FastAPI(lifespan=lifespan)
+
+# ✅ Allow all CORS (no restrictions)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # allow all domains
+    allow_credentials=True,
+    allow_methods=["*"],  # allow all HTTP methods (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # allow all headers
+)
 
 @app.get("/status")
 async def get_status():
